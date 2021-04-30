@@ -1,0 +1,78 @@
+  * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        /* background:#455A64; */
+      }
+      body {
+        width: 100vw;
+        height: 100vh;
+      }
+      .header {
+        height: 50px;
+        width: 100%;
+        text-align: center;
+        font-size: 20px;
+        padding: 10px;
+        color: #fff;
+        background: #7c4dff;
+      }
+      .header span {
+        color: greenyellow;
+      }
+      .chats {
+        width: 100%;
+        margin-top: 5px;
+        margin-bottom: 5px;
+        display: flex;
+        flex-direction: column;
+      }
+      .from {
+        /* border: 2px solid black; */
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 5px;
+      }
+      .contentfrom {
+        padding: 9px;
+        border-radius: 20px;
+        background: #f57c00;
+        color: #fff;
+        font-size: 18px;
+      }
+      .to {
+        /* border: 2px solid black; */
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 5px;
+      }
+      .contentto {
+        padding: 9px;
+        border-radius: 20px;
+        background: #448aff;
+        color: #fff;
+        font-size: 18px;
+      }
+      .sendbox {
+        bottom: 0;
+        position: absolute;
+        margin-bottom: 50px;
+        width: 100%;
+        text-align: center;
+      }
+      .sendbox input {
+        width: 80vw;
+        height: 50px;
+        font-size: 20px;
+        padding: 5px;
+      }
+      .sendbox button {
+        width: 90px;
+        height: 50px;
+        font-size: 20px;
+        font-style: bold;
+      }
+      .chats{
+        height: 80vh;
+        overflow-y: scroll;
+      }

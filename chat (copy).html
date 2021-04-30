@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Chat Now</title>
+  </head>
+  <body>
+
+  </body>
+  <div class="header"><a id="username">....</a><span class="online">Online</span></div>
+  <div class="chats"></div>
+
+  <div class="sendbox">
+    <input type="text" name="message" id="message" required />
+    <button type="button" onClick="sendMessage()">Send</button>
+  </div>
+  <script
+    src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+    crossorigin="anonymous"
+  ></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"
+    integrity="sha512-2RDFHqfLZW8IhPRvQYmK9bTLfj/hddxGXQAred2wNZGkrKQkLGj8RCkXfRJPHlDerdHHIzTFaahq4s/P4V6Qig=="
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    const message_field = $("#message");
+    const recievedUser = "4a1179c8-a2c8-4794-bbfc-98c7f5cce610";
+    const currentUser = "aa788eb1-fad4-483d-8fa4-eece7a35ecd2";
+    const chatId = "606745573c2bc6a963fee033";
+
+    var messageRecieved = false;
+    const socket = io("http://localhost:3000",{
+      reconnectionDelayMax: 10000,
+      autoConnect : true,
+      auth: {
+        username: currentUser,
+      }
+    });
+    socket.on("connect", () => {
+      console.log(socket.id);
+      socket.emit("deleteMessage",{
+        "id":"60674628436fa21c0133eada"
+      })
+      $("#username").text(currentUser);
+      if(!messageRecieved){
+        load50();
+        messageRecieved = true;
+      }
+      
+    });
+
+    socket.on("notify",function(data){
+      console.log(data);
+    })
+
+    socket.on("oldmesssagesrecieved",function(data){
+      const j = data.docs.length-1;
+      console.log(data);
+      $.each(data.docs, function(i) {
+        if(data.docs[j-i].send_by == currentUser){
+          addMessage("to",data.docs[j-i].content);
+        }
+        if(data.docs[j-i].send_by == recievedUser){
+          addMessage("from",data.docs[j-i].content);
+        }
+        // console.log(`${data[i].content} ${data[i].send_by}`);
+    });
+      $(".chats").scrollTop($(".chats")[0].scrollHeight);
+    });
+
+
+    socket.on("newmessage", function ({content, sendBy}) {
+            console.log("Got something")
+
+      if(sendBy == recievedUser){
+          addMessage("from", content);
+          console.log(content);
+      }
+    });
+
+    socket.on("update",function(data){
+      console.log(data);
+    })
+
+    socket.on("chatlists",function(data){
+      console.log(data);
+    })
+    function load50(){
+      socket.emit("online_status","4a1179c8-a2c8-4794-bbfc-98c7f5cce610");
+      socket.emit("getChatList");
+      socket.emit("oldmessages",{
+        "chatId" : chatId,
+        "page" : 0,
+        "limit" : 20
+      })
+    }
+
+    function sendMessage() {
+      var message = message_field.val().trim();
+      if (message != "") {
+        message_field.val("");
+        addMessage("to", message);
+        socket.emit("sendprivatemessage", {"content" : message,"toUserId": recievedUser,"chatId" : chatId});
+      }
+    }
+        function addMessage(user, message) {
+      if (user == "to") {
+        $(`<div class="to">
+      <div class="contentto">${message}</div>
+    </div>`).appendTo($(".chats"));
+      }
+      if (user == "from") {
+        $(`<div class="from">
+      <div class="contentfrom">${message}</div>
+    </div>`).appendTo($(".chats"));
+      }
+    }
+  </script>
+</html>
