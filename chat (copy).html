@@ -29,24 +29,16 @@
   ></script>
   <script>
     const message_field = $("#message");
-    const recievedUser = "4a1179c8-a2c8-4794-bbfc-98c7f5cce610";
-    const currentUser = "aa788eb1-fad4-483d-8fa4-eece7a35ecd2";
-    const chatId = "606745573c2bc6a963fee033";
 
+    const name = "Tanmoy Sarkar";
     var messageRecieved = false;
     const socket = io("http://localhost:3000",{
       reconnectionDelayMax: 10000,
       autoConnect : true,
-      auth: {
-        username: currentUser,
-      }
     });
+
     socket.on("connect", () => {
       console.log(socket.id);
-      socket.emit("deleteMessage",{
-        "id":"60674628436fa21c0133eada"
-      })
-      $("#username").text(currentUser);
       if(!messageRecieved){
         load50();
         messageRecieved = true;
@@ -54,60 +46,58 @@
       
     });
 
-    socket.on("notify",function(data){
-      console.log(data);
-    })
+
+
 
     socket.on("oldmesssagesrecieved",function(data){
-      const j = data.docs.length-1;
+      // const j = data.docs.length-1;
       console.log(data);
-      $.each(data.docs, function(i) {
-        if(data.docs[j-i].send_by == currentUser){
-          addMessage("to",data.docs[j-i].content);
-        }
-        if(data.docs[j-i].send_by == recievedUser){
-          addMessage("from",data.docs[j-i].content);
-        }
-        // console.log(`${data[i].content} ${data[i].send_by}`);
+      $.each(data, function(i) {
+        // if(data.docs[j-i].send_by == currentUser){
+        //   addMessage("to",data.docs[j-i].content);
+        // }
+        // if(data.docs[j-i].send_by == recievedUser){
+        //   addMessage("from",data.docs[j-i].content);
+        // }
+        addMessage("from",data[i].content)
     });
       $(".chats").scrollTop($(".chats")[0].scrollHeight);
     });
 
 
-    socket.on("newmessage", function ({content, sendBy}) {
-            console.log("Got something")
 
-      if(sendBy == recievedUser){
-          addMessage("from", content);
+    socket.on("newmessage", function ({content, sendBy}) {
+          addMessage("from", `${content} ${sendBy}`);
           console.log(content);
-      }
+
     });
 
-    socket.on("update",function(data){
-      console.log(data);
-    })
 
-    socket.on("chatlists",function(data){
-      console.log(data);
-    })
+
     function load50(){
-      socket.emit("online_status","4a1179c8-a2c8-4794-bbfc-98c7f5cce610");
-      socket.emit("getChatList");
       socket.emit("oldmessages",{
-        "chatId" : chatId,
         "page" : 0,
-        "limit" : 20
+        "limit" : 10
       })
     }
+
 
     function sendMessage() {
       var message = message_field.val().trim();
       if (message != "") {
         message_field.val("");
         addMessage("to", message);
-        socket.emit("sendprivatemessage", {"content" : message,"toUserId": recievedUser,"chatId" : chatId});
+        socket.emit("livemessage", {"content" : message,"name": name});
       }
     }
+
+
+
+
+
+
+
+
         function addMessage(user, message) {
       if (user == "to") {
         $(`<div class="to">
